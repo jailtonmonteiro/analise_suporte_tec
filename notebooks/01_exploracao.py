@@ -89,14 +89,18 @@ df.groupby('hora_abertura')['chamado_id'].count().sort_values(ascending=False)
 prioritario = df[df['prioridade'] == 'Crítica'].groupby(['categoria','prioridade'])['chamado_id'].count().sort_values(ascending=False)
 prioritario.head()
 # %%
-#Qual é o tempo médio de resolução?
-    
+#Qual é o tempo médio de resolução?    
 #Qual é o tempo mediano de resolução?
-    
+tempo_medio = df['tempo_resolucao_horas'].describe()
+tempo_medio
+# %%
 #Qual categoria demora mais para ser resolvida?
-    
+pd.to_timedelta((df.groupby('categoria')['tempo_resolucao_horas'].median()), unit='h').sort_values(ascending=False)
+
+# %%
 #Qual técnico possui o maior tempo médio de resolução?
-    
+pd.to_timedelta((df.groupby('tecnico')['tempo_resolucao_horas'].mean()), unit='h').sort_values(ascending=False)
 #Qual percentual dos chamados está dentro do SLA?
-    
+((df.groupby('dentro_sla')['chamado_id'].count() / df.shape[0]) * 100).round(2)
 #Qual categoria possui o pior cumprimento de SLA?
+df[df['dentro_sla'] == 'Sim'].groupby('categoria')['chamado_id'].count().sort_values(ascending=False)
