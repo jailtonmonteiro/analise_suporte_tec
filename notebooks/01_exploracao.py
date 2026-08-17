@@ -100,7 +100,49 @@ pd.to_timedelta((df.groupby('categoria')['tempo_resolucao_horas'].median()), uni
 # %%
 #Qual técnico possui o maior tempo médio de resolução?
 pd.to_timedelta((df.groupby('tecnico')['tempo_resolucao_horas'].mean()), unit='h').sort_values(ascending=False)
+
+# %%
 #Qual percentual dos chamados está dentro do SLA?
 ((df.groupby('dentro_sla')['chamado_id'].count() / df.shape[0]) * 100).round(2)
+
+#%%
 #Qual categoria possui o pior cumprimento de SLA?
-df[df['dentro_sla'] == 'Sim'].groupby('categoria')['chamado_id'].count().sort_values(ascending=False)
+pd.to_timedelta(df[df['dentro_sla'] == 'Não'].groupby('categoria')['tempo_resolucao_horas'].median(), unit='h').sort_values(ascending=False)
+# %%
+# Quantos chamados existem?
+total_chamados = df['chamado_id'].count()
+# Quantos foram encerrados?
+chamado_encerrado = df[df['status'] == 'Fechado']['chamado_id'].count() + df[df['status'] == 'Resolvido']['chamado_id'].count()
+#Quantos ainda estão abertos?
+chamados_pendentes = df[df['status'] == 'Aberto']['chamado_id'].count() + df[df['status'] == 'Em andamento']['chamado_id'].count()
+# Quantos são de alta/criticidade elevada?
+chamados_criticos = df[df['prioridade'] == 'Crítica']['chamado_id'].count()
+# Quanto tempo, em média, o suporte leva para resolver?
+media_resolucao = pd.to_timedelta(df['tempo_resolucao_horas'].mean().round(1), unit='h')
+# Qual é o tempo mediano de resolução?
+mediana_resolucao = pd.to_timedelta(df['tempo_resolucao_horas'].median().round(1), unit='h')
+# Qual % dos chamados respeitou o SLA?
+# %%
+sla_cumprido = (df.groupby('dentro_sla')['chamado_id'].count() / df.shape[0] * 100).round(2).iloc[1]
+# %%
+print(f"""
+    Total de chamados:          {total_chamados}
+    Chamados resolvidos:        {chamado_encerrado}
+    Chamados pendentes:         {chamados_pendentes}
+    Alta prioridade:            {chamados_criticos}
+    Tempo médio resolução:      {media_resolucao}
+    Mediana resolução:          {mediana_resolucao}
+    SLA cumprido:               {sla_cumprido} %
+""")
+# %%
+# Qual categoria possui mais chamados?
+# Qual categoria possui o maior tempo médio de resolução?
+# Qual categoria possui mais chamados de alta prioridade?
+# Qual categoria possui o pior SLA?
+# Quem resolve mais chamados?
+# Quem possui o menor tempo médio de resolução?
+# Existe algum técnico com volume muito maior que os outros?
+# Existe algum técnico com SLA significativamente pior?
+# Qual mês teve mais chamados?
+# O volume de chamados está aumentando ou diminuindo?
+# Existe algum dia da semana com concentração de chamados?
