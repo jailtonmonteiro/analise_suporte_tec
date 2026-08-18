@@ -1,6 +1,5 @@
 # %%
 import pandas as pd
-
 arquivo = '../data/raw/base.csv'
 # %%
 df = pd.read_csv(arquivo)
@@ -134,13 +133,31 @@ print(f"""
     Mediana resolução:          {mediana_resolucao}
     SLA cumprido:               {sla_cumprido} %
 """)
+
 # %%
 # Qual categoria possui mais chamados?
+df.groupby('categoria')['chamado_id'].count().sort_values(ascending=False)
+
+# %%
 # Qual categoria possui o maior tempo médio de resolução?
+df.groupby('categoria')['tempo_resolucao_horas'].mean().sort_values(ascending=False).round(1)
+
+# %%
 # Qual categoria possui mais chamados de alta prioridade?
+df[df['prioridade'] == 'Crítica'].groupby('categoria')['chamado_id'].count().sort_values(ascending=False)
+
+#%%
 # Qual categoria possui o pior SLA?
+pd.to_timedelta(df[df['dentro_sla'] == 'Não'].groupby('categoria')['tempo_resolucao_horas'].median(), unit='h')
+
+# %%
 # Quem resolve mais chamados?
+df.groupby('tecnico')['chamado_id'].count().sort_values(ascending=False)
+
+# %%
 # Quem possui o menor tempo médio de resolução?
+df.groupby('tecnico')['tempo_resolucao_horas'].mean().sort_values()
+
 # Existe algum técnico com volume muito maior que os outros?
 # Existe algum técnico com SLA significativamente pior?
 # Qual mês teve mais chamados?
