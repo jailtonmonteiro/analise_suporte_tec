@@ -212,3 +212,13 @@ relat_tec['tempo_medio'] = pd.to_timedelta(relat_tec['tempo_medio'], unit='h').d
 relat_tec['perc_sla_expirado'] = relat_tec['perc_sla_expirado'].round(2)
 relat_tec
 # %%
+faixas = ['Bom desempenho', 'Atenção', 'Crítico']
+cortes = [0, 27, 28, float('inf')]
+
+relat_tec['classificacao'] = pd.cut(
+    x=relat_tec['perc_sla_expirado'],
+    bins=cortes,
+    labels=faixas
+)
+relat_tec
+# %%
