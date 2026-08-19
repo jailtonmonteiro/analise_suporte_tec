@@ -222,3 +222,40 @@ relat_tec['classificacao'] = pd.cut(
 )
 relat_tec
 # %%
+# Qual categoria merece mais atenção
+df_temp = df.copy()
+df_temp['tempo_resolucao_horas'] = pd.to_timedelta(df_temp['tempo_resolucao_horas'], unit='h')
+atencao = df_temp.groupby('categoria').agg(
+    qtd_chamados=('chamado_id', 'size'),
+    tempo_medio=('tempo_resolucao_horas', 'mean'),
+    fora_sla=('dentro_sla', lambda x: (x == 'Não').mean()*100)
+)
+
+atencao['tempo_medio'] = atencao['tempo_medio'].dt.floor('min')
+atencao['fora_sla'] = atencao['fora_sla'].round(1)
+atencao['rep_chamados'] = (atencao['qtd_chamados'] / atencao['qtd_chamados'].sum())*100
+atencao.sort_values('tempo_medio', ascending=False)
+# Sistemas corporativos possui um volume relativamente alto, representando 17.2% da base total de chamados, com um tempo de atendimento médio de 1 dia e 16 horas, deixando cerca de 50% dos atendimentos fora do tempo de sla previsto.
+#Sistemas corporativos é 2º em volume, 1º em tempo médio e 1º em descumprimento de SLA."
+# %%
+prioridades = df.groupby('categoria').agg(
+    qtd_chamados=('chamado_id', 'size'),
+    baixo=('prioridade', lambda x: (x == 'Baixa').sum()),
+    media=('prioridade', lambda x: (x == 'Média').sum()),
+    alta=('prioridade', lambda x: (x == 'Alta').sum()),
+    critica=('prioridade', lambda x: (x == 'Crítica').sum()),
+)
+prioridades['%_criticos'] = (prioridades['critica'] / prioridades['qtd_chamados'] * 100).round(1)
+prioridades
+
+# %%
+
+cross_prioridade = pd.crosstab(
+    index=df['categoria'],
+    columns=df['prioridade'],
+    margins=True,
+    margins_name='Total Geral'
+)
+
+cross_prioridade['%_criticos'] = (cross_prioridade['Crítica'] / cross_prioridade['Total Geral'] * 100).round(1)
+cross_prioridade
