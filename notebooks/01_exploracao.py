@@ -259,3 +259,21 @@ cross_prioridade = pd.crosstab(
 
 cross_prioridade['%_criticos'] = (cross_prioridade['Crítica'] / cross_prioridade['Total Geral'] * 100).round(1)
 cross_prioridade
+# %%
+# Qual categoria representa a maior parte dos chamados de cada técnico?
+cross_tec_cat = (pd.crosstab(
+    index=df_temp['tecnico'],
+    columns=df_temp['categoria'],
+    margins=False,
+    normalize='index'
+) * 100).round(2)
+
+destaques = []
+for coluna in cross_tec_cat.columns:
+    nome_tec = cross_tec_cat[coluna].idxmax()
+    top_valor = cross_tec_cat[coluna].max()
+
+    destaques.append(f"{nome_tec} possui {top_valor} % dos chamados de {coluna}")
+
+for i in destaques:
+    print(i)
