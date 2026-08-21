@@ -268,12 +268,29 @@ cross_tec_cat = (pd.crosstab(
     normalize='index'
 ) * 100).round(2)
 
-destaques = []
+
 for coluna in cross_tec_cat.columns:
     nome_tec = cross_tec_cat[coluna].idxmax()
     top_valor = cross_tec_cat[coluna].max()
 
+    des = pd.DataFrame()
     destaques.append(f"{nome_tec} possui {top_valor} % dos chamados de {coluna}")
 
 for i in destaques:
     print(i)
+# %%
+categoria_tec_relat = pd.merge(relat_tec, cross_tec_cat, on='tecnico')
+categoria_tec_relat.sort_values('sla_expirado', ascending=False)
+
+# Dentre o total de chamados Thiago Carvalho possui 29.14% com sla expirado, dentro da sua distribuição de atendimentos 20.08% são de acesso e 16.95 são de Sistemas Corporativos, sendo o que mais atende chamados da categoria, ele tem um total de 9568 chamados atribuidos
+
+# %%
+# Dentro dos chamados do Thiago, qual percentual pertence a Sistemas Corporativos?
+dist_tec = (pd.crosstab(
+    index=df_temp['tecnico'],
+    columns=df_temp['categoria'],
+    margins=False,
+    normalize='columns'
+) * 100).round(2)
+
+dist_tec
